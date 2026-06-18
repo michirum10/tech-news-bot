@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import logging
+from urllib.parse import quote
 
 import feedparser
 import requests
@@ -31,7 +32,7 @@ def fetch_arxiv(cfg):
     kws = " OR ".join(f"all:{k}" for k in cfg["keywords"])
     query = f"({cats}) AND ({kws})"
     url = (
-        f"http://export.arxiv.org/api/query?search_query={query}"
+        f"http://export.arxiv.org/api/query?search_query={quote(query)}"
         f"&sortBy=submittedDate&sortOrder=descending"
         f"&max_results={cfg['max_results']}"
     )
