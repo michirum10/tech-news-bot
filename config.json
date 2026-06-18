@@ -1,0 +1,18 @@
+{
+  "arxiv": {
+    "categories": ["cs.AI", "cs.CL"],
+    "keywords": ["distillation", "LoRA", "retrieval augmented", "LLM agent"],
+    "max_results": 30
+  },
+  "hn": {
+    "min_points": 100
+  },
+  "summarize": {
+    "enabled": true,
+    "provider": "gemini",
+    "model": "gemini-2.5-flash-lite",
+    "lang": "ja",
+    "style": "3行・専門用語は英語のまま残す",
+    "translate_hn_titles": true
+  }
+}
