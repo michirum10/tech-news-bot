@@ -1,4 +1,4 @@
-name: arXiv + HN Watcher
+name: arXiv + HN + Tech Watcher
 
 on:
   schedule:
@@ -25,6 +25,7 @@ jobs:
         env:
           DISCORD_WEBHOOK_ARXIV: ${{ secrets.DISCORD_WEBHOOK_ARXIV }}
           DISCORD_WEBHOOK_HN: ${{ secrets.DISCORD_WEBHOOK_HN }}
+          DISCORD_WEBHOOK_TECH: ${{ secrets.DISCORD_WEBHOOK_TECH }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python main.py
 

@@ -73,6 +73,28 @@ def fetch_hn(cfg):
     return results
 
 
+def fetch_rss(name, cfg):
+    url = cfg["feed_url"]
+    max_results = cfg.get("max_results", 10)
+    log.info("Fetching %s: %s", name, url)
+    feed = feedparser.parse(url)
+    if feed.bozo and not feed.entries:
+        raise RuntimeError(f"{name} fetch failed: {feed.bozo_exception}")
+    results = []
+    for e in feed.entries[:max_results]:
+        entry_id = e.get("id") or e.get("link", "")
+        description = e.get("summary", "")
+        if description:
+            description = " ".join(description.split())[:200]
+        results.append({
+            "id": entry_id,
+            "title": e.get("title", ""),
+            "link": e.get("link", ""),
+            "description": description,
+        })
+    return results
+
+
 def filter_new(entries, seen_ids, key="id"):
     seen_set = set(seen_ids)
     return [e for e in entries if e[key] not in seen_set]
@@ -148,7 +170,7 @@ def summarize_arxiv(papers, cfg_sum):
         return {}
 
 
-def translate_hn_titles(entries, cfg_sum):
+def translate_titles(entries, source_label, cfg_sum):
     if not entries:
         return {}
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -160,7 +182,7 @@ def translate_hn_titles(entries, cfg_sum):
 
     items = [{"id": e["id"], "title": e["title"]} for e in entries]
     prompt = (
-        "以下のHacker Newsタイトルを日本語に翻訳してください。\n"
+        f"以下の{source_label}のタイトルを日本語に翻訳してください。\n"
         "出力は JSON 配列のみ。前置き・コードフェンス禁止。要素は {\"id\": \"...\", \"title_ja\": \"...\"}。\n\n"
         f"{json.dumps(items, ensure_ascii=False)}"
     )
@@ -174,10 +196,10 @@ def translate_hn_titles(entries, cfg_sum):
             text = text.rsplit("```", 1)[0]
             text = text.strip()
         translations = json.loads(text)
-        log.info("Translated %d/%d HN titles", len(translations), len(entries))
+        log.info("Translated %d/%d %s titles", len(translations), len(entries), source_label)
         return {t["id"]: t["title_ja"] for t in translations}
     except Exception as exc:
-        log.warning("HN title translation failed: %s", exc)
+        log.warning("%s title translation failed: %s", source_label, exc)
         log.warning("Raw response: %.500s", text)
         return {}
 
@@ -283,6 +305,17 @@ def format_hn_message(entry, title_ja):
     return "\n".join(lines)
 
 
+def format_rss_message(tag, entry, title_ja):
+    title_part = f"**[{tag}]** {entry['title']}"
+    if title_ja:
+        title_part += f"（{title_ja}）"
+    lines = [title_part]
+    if entry.get("description"):
+        lines.append(entry["description"][:150])
+    lines.append(entry["link"])
+    return "\n".join(lines)
+
+
 def main():
     config = load_json(CONFIG_PATH)
     seen = load_json(SEEN_PATH)
@@ -312,14 +345,46 @@ def main():
     summaries = {}
     hn_translations = {}
 
+    rss_sources = {
+        "techcrunch": {"tag": "TC", "label": "TechCrunch"},
+        "producthunt": {"tag": "PH", "label": "Product Hunt"},
+        "lobsters": {"tag": "Lob", "label": "Lobsters"},
+    }
+    rss_entries = {}
+    for key, meta in rss_sources.items():
+        if key in config:
+            try:
+                rss_entries[key] = fetch_rss(meta["label"], config[key])
+            except Exception as exc:
+                log.error("%s fetch error: %s", meta["label"], exc)
+                errors.append(str(exc))
+                rss_entries[key] = []
+        else:
+            rss_entries[key] = []
+
+    new_rss = {}
+    for key in rss_sources:
+        new_rss[key] = filter_new(rss_entries[key], seen.get(key, []))
+
     if cfg_sum.get("enabled", False):
         if new_arxiv:
             summaries = summarize_arxiv(new_arxiv, cfg_sum)
         if new_hn and cfg_sum.get("translate_hn_titles", False):
-            hn_translations = translate_hn_titles(new_hn, cfg_sum)
+            hn_translations = translate_titles(new_hn, "HN", cfg_sum)
+
+    all_new_rss = []
+    for key in rss_sources:
+        all_new_rss.extend(new_rss[key])
+    rss_translations = {}
+    if cfg_sum.get("enabled", False) and all_new_rss:
+        rss_translations = translate_titles(all_new_rss, "Tech News", cfg_sum)
+
+    log.info("New arXiv: %d, New HN: %d, New Tech: %d",
+             len(new_arxiv), len(new_hn), len(all_new_rss))
 
     webhook_arxiv = os.environ.get("DISCORD_WEBHOOK_ARXIV", "")
     webhook_hn = os.environ.get("DISCORD_WEBHOOK_HN", "")
+    webhook_tech = os.environ.get("DISCORD_WEBHOOK_TECH", "")
 
     arxiv_messages = []
     for paper in new_arxiv:
@@ -330,6 +395,12 @@ def main():
     for entry in new_hn:
         title_ja = hn_translations.get(entry["id"], "")
         hn_messages.append(format_hn_message(entry, title_ja))
+
+    tech_messages = []
+    for key, meta in rss_sources.items():
+        for entry in new_rss[key]:
+            title_ja = rss_translations.get(entry["id"], "")
+            tech_messages.append(format_rss_message(meta["tag"], entry, title_ja))
 
     if cfg_sum.get("enabled", False):
         if new_arxiv:
@@ -362,6 +433,22 @@ def main():
                     log.error("Discord post failed (HN digest): %s", exc)
                     errors.append(str(exc))
 
+        if all_new_rss:
+            tech_items = []
+            for e in all_new_rss:
+                title_ja = rss_translations.get(e["id"], "")
+                tech_items.append({"title": e["title"], "title_ja": title_ja, "description": e.get("description", "")})
+            tech_digest = generate_digest(
+                "Tech News (TechCrunch/Product Hunt/Lobsters)",
+                json.dumps(tech_items, ensure_ascii=False), cfg_sum
+            )
+            if tech_digest:
+                try:
+                    post_discord(webhook_tech, f"**Daily Digest**\n{tech_digest}"[:DISCORD_MAX_LENGTH])
+                except Exception as exc:
+                    log.error("Discord post failed (Tech digest): %s", exc)
+                    errors.append(str(exc))
+
     try:
         post_discord_batched(webhook_arxiv, arxiv_messages)
     except Exception as exc:
@@ -374,12 +461,22 @@ def main():
         log.error("Discord post failed (HN): %s", exc)
         errors.append(str(exc))
 
+    try:
+        post_discord_batched(webhook_tech, tech_messages)
+    except Exception as exc:
+        log.error("Discord post failed (Tech): %s", exc)
+        errors.append(str(exc))
+
     notified_arxiv_ids = [p["id"] for p in new_arxiv]
     notified_hn_ids = [e["id"] for e in new_hn]
     seen["arxiv"] = seen.get("arxiv", []) + notified_arxiv_ids
     seen["hn"] = seen.get("hn", []) + notified_hn_ids
+    for key in rss_sources:
+        notified = [e["id"] for e in new_rss[key]]
+        seen[key] = seen.get(key, []) + notified
     save_json(SEEN_PATH, seen)
-    log.info("Updated seen.json: +%d arXiv, +%d HN", len(notified_arxiv_ids), len(notified_hn_ids))
+    log.info("Updated seen.json: +%d arXiv, +%d HN, +%d Tech",
+             len(notified_arxiv_ids), len(notified_hn_ids), len(all_new_rss))
 
     if errors:
         log.error("Finished with errors: %s", errors)
