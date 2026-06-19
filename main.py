@@ -116,16 +116,35 @@ def summarize_arxiv(papers, cfg_sum):
         f"{json.dumps(items, ensure_ascii=False)}"
     )
 
+    text = ""
     try:
         text = call_gemini_with_retry(client, model, prompt)
         text = text.strip()
         if text.startswith("```"):
             text = text.split("\n", 1)[1]
             text = text.rsplit("```", 1)[0]
+            text = text.strip()
         summaries = json.loads(text)
-        return {s["id"]: s["summary_ja"] for s in summaries}
+        paper_ids = {p["id"] for p in papers}
+        result = {}
+        for s in summaries:
+            sid = s.get("id", "")
+            summary = s.get("summary_ja", "")
+            if sid in paper_ids:
+                result[sid] = summary
+            else:
+                for pid in paper_ids:
+                    if pid.startswith(sid) or sid.startswith(pid):
+                        result[pid] = summary
+                        break
+        log.info("Summarized %d/%d papers", len(result), len(papers))
+        if len(result) < len(papers):
+            missing = paper_ids - set(result.keys())
+            log.warning("Missing summaries for: %s", missing)
+        return result
     except Exception as exc:
         log.warning("Summarization failed: %s", exc)
+        log.warning("Raw response: %.500s", text)
         return {}
 
 
@@ -146,16 +165,20 @@ def translate_hn_titles(entries, cfg_sum):
         f"{json.dumps(items, ensure_ascii=False)}"
     )
 
+    text = ""
     try:
         text = call_gemini_with_retry(client, model, prompt)
         text = text.strip()
         if text.startswith("```"):
             text = text.split("\n", 1)[1]
             text = text.rsplit("```", 1)[0]
+            text = text.strip()
         translations = json.loads(text)
+        log.info("Translated %d/%d HN titles", len(translations), len(entries))
         return {t["id"]: t["title_ja"] for t in translations}
     except Exception as exc:
         log.warning("HN title translation failed: %s", exc)
+        log.warning("Raw response: %.500s", text)
         return {}
 
 

@@ -2,10 +2,10 @@
   "arxiv": {
     "categories": ["cs.AI", "cs.CL"],
     "keywords": ["distillation", "LoRA", "retrieval augmented", "LLM agent"],
-    "max_results": 30
+    "max_results": 10
   },
   "hn": {
-    "min_points": 100
+    "min_points": 300
   },
   "summarize": {
     "enabled": true,
