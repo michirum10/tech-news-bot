@@ -237,8 +237,8 @@ def format_arxiv_message(paper, summary_ja):
     )
 
 
-def generate_daily_digest(new_arxiv, summaries, new_hn, hn_translations, cfg_sum):
-    if not new_arxiv and not new_hn:
+def generate_digest(source_label, items_json, cfg_sum):
+    if not items_json:
         return ""
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -247,40 +247,26 @@ def generate_daily_digest(new_arxiv, summaries, new_hn, hn_translations, cfg_sum
     client = genai.Client(api_key=api_key)
     model = cfg_sum.get("model", "gemini-2.5-flash-lite")
 
-    arxiv_items = []
-    for p in new_arxiv:
-        summary = summaries.get(p["id"], p["abstract"][:200])
-        arxiv_items.append({"title": p["title"], "summary": summary})
-
-    hn_items = []
-    for e in new_hn:
-        title_ja = hn_translations.get(e["id"], "")
-        hn_items.append({"title": e["title"], "title_ja": title_ja})
-
-    news_data = json.dumps(
-        {"arxiv": arxiv_items, "hn": hn_items}, ensure_ascii=False
-    )
-
     prompt = (
-        "あなたはAI/LLM開発者向けのニュースアナリストです。\n"
-        "以下の今日のarXiv論文とHacker Newsの記事を分析し、日本語で「デイリーダイジェスト」を作成してください。\n\n"
+        f"あなたはAI/LLM開発者向けのニュースアナリストです。\n"
+        f"以下の今日の{source_label}を分析し、日本語で「デイリーダイジェスト」を作成してください。\n\n"
         "フォーマット（Markdown）:\n"
         "## 今日のトレンド\n"
-        "複数の論文/記事に共通するテーマや注目すべき流れを2-3行で\n\n"
+        "複数の記事に共通するテーマや注目すべき流れを2-3行で\n\n"
         "## 開発に活かせるポイント\n"
         "個人開発やプロジェクトに取り入れられる具体的な手法・ツール・アイデアを箇条書き3つ以内\n\n"
         "## 注目の1本\n"
-        "特に読むべき論文or記事を1つ選び、なぜ注目かを1-2行で\n\n"
+        "特に読むべき記事を1つ選び、なぜ注目かを1-2行で\n\n"
         "注意: 簡潔に。専門用語は英語のまま。全体で400字以内。\n\n"
-        f"{news_data}"
+        f"{items_json}"
     )
 
     try:
         text = call_gemini_with_retry(client, model, prompt)
-        log.info("Daily digest generated")
+        log.info("%s digest generated", source_label)
         return text.strip()
     except Exception as exc:
-        log.warning("Daily digest generation failed: %s", exc)
+        log.warning("%s digest generation failed: %s", source_label, exc)
         return ""
 
 
@@ -345,17 +331,36 @@ def main():
         title_ja = hn_translations.get(entry["id"], "")
         hn_messages.append(format_hn_message(entry, title_ja))
 
-    digest = ""
-    if cfg_sum.get("enabled", False) and (new_arxiv or new_hn):
-        digest = generate_daily_digest(new_arxiv, summaries, new_hn, hn_translations, cfg_sum)
+    if cfg_sum.get("enabled", False):
+        if new_arxiv:
+            arxiv_items = []
+            for p in new_arxiv:
+                summary = summaries.get(p["id"], p["abstract"][:200])
+                arxiv_items.append({"title": p["title"], "summary": summary})
+            arxiv_digest = generate_digest(
+                "arXiv論文", json.dumps(arxiv_items, ensure_ascii=False), cfg_sum
+            )
+            if arxiv_digest:
+                try:
+                    post_discord(webhook_arxiv, f"**Daily Digest**\n{arxiv_digest}"[:DISCORD_MAX_LENGTH])
+                except Exception as exc:
+                    log.error("Discord post failed (arXiv digest): %s", exc)
+                    errors.append(str(exc))
 
-    if digest:
-        digest_msg = f"**Daily Digest**\n{digest}"
-        try:
-            post_discord(webhook_arxiv, digest_msg[:DISCORD_MAX_LENGTH])
-        except Exception as exc:
-            log.error("Discord post failed (digest): %s", exc)
-            errors.append(str(exc))
+        if new_hn:
+            hn_items = []
+            for e in new_hn:
+                title_ja = hn_translations.get(e["id"], "")
+                hn_items.append({"title": e["title"], "title_ja": title_ja})
+            hn_digest = generate_digest(
+                "Hacker News記事", json.dumps(hn_items, ensure_ascii=False), cfg_sum
+            )
+            if hn_digest:
+                try:
+                    post_discord(webhook_hn, f"**Daily Digest**\n{hn_digest}"[:DISCORD_MAX_LENGTH])
+                except Exception as exc:
+                    log.error("Discord post failed (HN digest): %s", exc)
+                    errors.append(str(exc))
 
     try:
         post_discord_batched(webhook_arxiv, arxiv_messages)
