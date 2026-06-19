@@ -7,6 +7,18 @@
   "hn": {
     "min_points": 300
   },
+  "techcrunch": {
+    "feed_url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "max_results": 10
+  },
+  "producthunt": {
+    "feed_url": "https://www.producthunt.com/feed",
+    "max_results": 10
+  },
+  "lobsters": {
+    "feed_url": "https://lobste.rs/t/ai,ml.rss",
+    "max_results": 10
+  },
   "summarize": {
     "enabled": true,
     "provider": "gemini",
