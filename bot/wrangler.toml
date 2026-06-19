@@ -1,0 +1,6 @@
+name = "arxiv-hn-bot"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Non-secret config (secrets are set via `wrangler secret put`)
