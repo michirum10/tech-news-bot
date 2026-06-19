@@ -159,12 +159,40 @@ def translate_hn_titles(entries, cfg_sum):
         return {}
 
 
+DISCORD_MAX_LENGTH = 2000
+
+
 def post_discord(webhook_url, message):
     if not webhook_url:
         log.warning("Webhook URL not set, skipping notification")
         return
-    resp = requests.post(webhook_url, json={"content": message}, timeout=30)
+    for attempt in range(5):
+        resp = requests.post(webhook_url, json={"content": message}, timeout=30)
+        if resp.status_code == 429:
+            retry_after = resp.json().get("retry_after", 2 ** attempt)
+            log.warning("Discord rate limited, retrying in %.1fs...", retry_after)
+            time.sleep(retry_after)
+            continue
+        resp.raise_for_status()
+        return
     resp.raise_for_status()
+
+
+def post_discord_batched(webhook_url, messages):
+    if not webhook_url or not messages:
+        return
+    batch = ""
+    for msg in messages:
+        separator = "\n---\n"
+        candidate = batch + separator + msg if batch else msg
+        if len(candidate) > DISCORD_MAX_LENGTH:
+            if batch:
+                post_discord(webhook_url, batch)
+            batch = msg[:DISCORD_MAX_LENGTH]
+        else:
+            batch = candidate
+    if batch:
+        post_discord(webhook_url, batch)
 
 
 def format_arxiv_message(paper, summary_ja):
@@ -237,23 +265,27 @@ def main():
     webhook_arxiv = os.environ.get("DISCORD_WEBHOOK_ARXIV", "")
     webhook_hn = os.environ.get("DISCORD_WEBHOOK_HN", "")
 
+    arxiv_messages = []
     for paper in new_arxiv:
         summary_ja = summaries.get(paper["id"], "")
-        msg = format_arxiv_message(paper, summary_ja)
-        try:
-            post_discord(webhook_arxiv, msg)
-        except Exception as exc:
-            log.error("Discord post failed (arXiv): %s", exc)
-            errors.append(str(exc))
+        arxiv_messages.append(format_arxiv_message(paper, summary_ja))
 
+    hn_messages = []
     for entry in new_hn:
         title_ja = hn_translations.get(entry["id"], "")
-        msg = format_hn_message(entry, title_ja)
-        try:
-            post_discord(webhook_hn, msg)
-        except Exception as exc:
-            log.error("Discord post failed (HN): %s", exc)
-            errors.append(str(exc))
+        hn_messages.append(format_hn_message(entry, title_ja))
+
+    try:
+        post_discord_batched(webhook_arxiv, arxiv_messages)
+    except Exception as exc:
+        log.error("Discord post failed (arXiv): %s", exc)
+        errors.append(str(exc))
+
+    try:
+        post_discord_batched(webhook_hn, hn_messages)
+    except Exception as exc:
+        log.error("Discord post failed (HN): %s", exc)
+        errors.append(str(exc))
 
     notified_arxiv_ids = [p["id"] for p in new_arxiv]
     notified_hn_ids = [e["id"] for e in new_hn]
