@@ -9,6 +9,8 @@ import feedparser
 import requests
 from google import genai
 
+from bot.github_trending import fetch_github_trending, format_trending_message
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger(__name__)
 
@@ -366,6 +368,17 @@ def main():
     for key in rss_sources:
         new_rss[key] = filter_new(rss_entries[key], seen.get(key, []))
 
+    # GitHub Trending
+    github_trending_entries = []
+    if "github_trending" in config:
+        try:
+            github_trending_entries = fetch_github_trending(config["github_trending"])
+        except Exception as exc:
+            log.error("GitHub Trending fetch error: %s", exc)
+            errors.append(str(exc))
+    new_trending = filter_new(github_trending_entries, seen.get("github_trending", []))
+    log.info("New GitHub Trending: %d", len(new_trending))
+
     if cfg_sum.get("enabled", False):
         if new_arxiv:
             summaries = summarize_arxiv(new_arxiv, cfg_sum)
@@ -385,6 +398,10 @@ def main():
     webhook_arxiv = os.environ.get("DISCORD_WEBHOOK_ARXIV", "")
     webhook_hn = os.environ.get("DISCORD_WEBHOOK_HN", "")
     webhook_tech = os.environ.get("DISCORD_WEBHOOK_TECH", "")
+    webhook_trending = os.environ.get(
+        "DISCORD_WEBHOOK_TRENDING",
+        os.environ.get("DISCORD_WEBHOOK_TECH", ""),
+    )
 
     arxiv_messages = []
     for paper in new_arxiv:
@@ -467,6 +484,14 @@ def main():
         log.error("Discord post failed (Tech): %s", exc)
         errors.append(str(exc))
 
+    # GitHub Trending通知
+    trending_messages = [format_trending_message(repo) for repo in new_trending]
+    try:
+        post_discord_batched(webhook_trending, trending_messages)
+    except Exception as exc:
+        log.error("Discord post failed (Trending): %s", exc)
+        errors.append(str(exc))
+
     notified_arxiv_ids = [p["id"] for p in new_arxiv]
     notified_hn_ids = [e["id"] for e in new_hn]
     seen["arxiv"] = seen.get("arxiv", []) + notified_arxiv_ids
@@ -474,9 +499,12 @@ def main():
     for key in rss_sources:
         notified = [e["id"] for e in new_rss[key]]
         seen[key] = seen.get(key, []) + notified
+    notified_trending_ids = [r["id"] for r in new_trending]
+    seen["github_trending"] = seen.get("github_trending", []) + notified_trending_ids
     save_json(SEEN_PATH, seen)
-    log.info("Updated seen.json: +%d arXiv, +%d HN, +%d Tech",
-             len(notified_arxiv_ids), len(notified_hn_ids), len(all_new_rss))
+    log.info("Updated seen.json: +%d arXiv, +%d HN, +%d Tech, +%d Trending",
+             len(notified_arxiv_ids), len(notified_hn_ids),
+             len(all_new_rss), len(notified_trending_ids))
 
     if errors:
         log.error("Finished with errors: %s", errors)

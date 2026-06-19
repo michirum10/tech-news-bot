@@ -19,6 +19,11 @@
     "feed_url": "https://lobste.rs/t/ai,ml.rss",
     "max_results": 10
   },
+  "github_trending": {
+    "languages": ["", "python"],
+    "since": "daily",
+    "max_results": 20
+  },
   "summarize": {
     "enabled": true,
     "provider": "gemini",
