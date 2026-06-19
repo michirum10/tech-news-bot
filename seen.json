@@ -1,1 +1,57 @@
-{"arxiv": [], "hn": [], "techcrunch": [], "producthunt": [], "lobsters": []}
+{
+  "arxiv": [
+    "2606.20560v1",
+    "2606.20554v1",
+    "2606.20529v1",
+    "2606.20523v1",
+    "2606.20520v1",
+    "2606.20518v1",
+    "2606.20517v1",
+    "2606.20510v1",
+    "2606.20508v1",
+    "2606.20506v1"
+  ],
+  "hn": [
+    "https://news.ycombinator.com/item?id=48585746",
+    "https://news.ycombinator.com/item?id=48583928",
+    "https://news.ycombinator.com/item?id=48583606",
+    "https://news.ycombinator.com/item?id=48583356",
+    "https://news.ycombinator.com/item?id=48578913"
+  ],
+  "techcrunch": [
+    "https://techcrunch.com/?p=3134483",
+    "https://techcrunch.com/?p=3134299",
+    "https://techcrunch.com/?p=3134342",
+    "https://techcrunch.com/?p=3134350",
+    "https://techcrunch.com/?p=3134243",
+    "https://techcrunch.com/?p=3134182",
+    "https://techcrunch.com/?p=3134218",
+    "https://techcrunch.com/?p=3133698",
+    "https://techcrunch.com/?p=3134184",
+    "https://techcrunch.com/?p=3134001"
+  ],
+  "producthunt": [
+    "tag:www.producthunt.com,2005:Post/1170217",
+    "tag:www.producthunt.com,2005:Post/1174276",
+    "tag:www.producthunt.com,2005:Post/1174875",
+    "tag:www.producthunt.com,2005:Post/1174209",
+    "tag:www.producthunt.com,2005:Post/1144239",
+    "tag:www.producthunt.com,2005:Post/1174393",
+    "tag:www.producthunt.com,2005:Post/1174907",
+    "tag:www.producthunt.com,2005:Post/1173208",
+    "tag:www.producthunt.com,2005:Post/1172848",
+    "tag:www.producthunt.com,2005:Post/1150612"
+  ],
+  "lobsters": [
+    "https://lobste.rs/s/inzoi4",
+    "https://lobste.rs/s/5majlp",
+    "https://lobste.rs/s/j11pew",
+    "https://lobste.rs/s/savxgn",
+    "https://lobste.rs/s/9iqluy",
+    "https://lobste.rs/s/uicwti",
+    "https://lobste.rs/s/q9sd1m",
+    "https://lobste.rs/s/fdjc6i",
+    "https://lobste.rs/s/tdy6ws",
+    "https://lobste.rs/s/tylzdy"
+  ]
+}
