@@ -30,7 +30,11 @@
     "https://news.ycombinator.com/item?id=48620090",
     "https://news.ycombinator.com/item?id=48618455",
     "https://news.ycombinator.com/item?id=48617990",
-    "https://news.ycombinator.com/item?id=48614844"
+    "https://news.ycombinator.com/item?id=48614844",
+    "https://news.ycombinator.com/item?id=48632884",
+    "https://news.ycombinator.com/item?id=48630020",
+    "https://news.ycombinator.com/item?id=48626137",
+    "https://news.ycombinator.com/item?id=48605561"
   ],
   "techcrunch": [
     "https://techcrunch.com/?p=3134483",
@@ -53,7 +57,15 @@
     "https://techcrunch.com/?p=3134695",
     "https://techcrunch.com/?p=3134677",
     "https://techcrunch.com/?p=3134737",
-    "https://techcrunch.com/?p=3134254"
+    "https://techcrunch.com/?p=3134254",
+    "https://techcrunch.com/?p=3135162",
+    "https://techcrunch.com/?p=3135102",
+    "https://techcrunch.com/?p=3134907",
+    "https://techcrunch.com/?p=3135044",
+    "https://techcrunch.com/?p=3135026",
+    "https://techcrunch.com/?p=3134778",
+    "https://techcrunch.com/?p=3133990",
+    "https://techcrunch.com/?p=3134762"
   ],
   "producthunt": [
     "tag:www.producthunt.com,2005:Post/1170217",
@@ -94,7 +106,17 @@
     "tag:www.producthunt.com,2005:Post/1176991",
     "tag:www.producthunt.com,2005:Post/1176905",
     "tag:www.producthunt.com,2005:Post/1173525",
-    "tag:www.producthunt.com,2005:Post/1176778"
+    "tag:www.producthunt.com,2005:Post/1176778",
+    "tag:www.producthunt.com,2005:Post/1177354",
+    "tag:www.producthunt.com,2005:Post/1176880",
+    "tag:www.producthunt.com,2005:Post/1177141",
+    "tag:www.producthunt.com,2005:Post/1175131",
+    "tag:www.producthunt.com,2005:Post/1176136",
+    "tag:www.producthunt.com,2005:Post/1177323",
+    "tag:www.producthunt.com,2005:Post/1177821",
+    "tag:www.producthunt.com,2005:Post/1162357",
+    "tag:www.producthunt.com,2005:Post/1177735",
+    "tag:www.producthunt.com,2005:Post/1174174"
   ],
   "lobsters": [
     "https://lobste.rs/s/inzoi4",
@@ -109,6 +131,11 @@
     "https://lobste.rs/s/tylzdy",
     "https://lobste.rs/s/watrw9",
     "https://lobste.rs/s/lhn5w5",
-    "https://lobste.rs/s/rdrtip"
+    "https://lobste.rs/s/rdrtip",
+    "https://lobste.rs/s/lpn1cr",
+    "https://lobste.rs/s/j04tzc",
+    "https://lobste.rs/s/luosjw",
+    "https://lobste.rs/s/vwin4l",
+    "https://lobste.rs/s/n1xvd7"
   ]
 }
