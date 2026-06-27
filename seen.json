@@ -29,7 +29,17 @@
     "2606.26057v1",
     "2606.26041v1",
     "2606.26040v1",
-    "2606.26036v1"
+    "2606.26036v1",
+    "2606.27377v1",
+    "2606.27347v1",
+    "2606.27334v1",
+    "2606.27330v1",
+    "2606.27316v1",
+    "2606.27314v1",
+    "2606.27288v1",
+    "2606.27287v1",
+    "2606.27275v1",
+    "2606.27251v1"
   ],
   "hn": [
     "https://news.ycombinator.com/item?id=48585746",
@@ -62,7 +72,9 @@
     "https://news.ycombinator.com/item?id=48646659",
     "https://news.ycombinator.com/item?id=48675179",
     "https://news.ycombinator.com/item?id=48673671",
-    "https://news.ycombinator.com/item?id=48672732"
+    "https://news.ycombinator.com/item?id=48672732",
+    "https://news.ycombinator.com/item?id=48690101",
+    "https://news.ycombinator.com/item?id=48689028"
   ],
   "techcrunch": [
     "https://techcrunch.com/?p=3134483",
@@ -112,7 +124,13 @@
     "https://techcrunch.com/?p=3136123",
     "https://techcrunch.com/?p=3136070",
     "https://techcrunch.com/?p=3136081",
-    "https://techcrunch.com/?p=3136083"
+    "https://techcrunch.com/?p=3136083",
+    "https://techcrunch.com/?p=3136773",
+    "https://techcrunch.com/?p=3136733",
+    "https://techcrunch.com/?post_type=tc_video&p=3136708",
+    "https://techcrunch.com/?p=3136684",
+    "https://techcrunch.com/?post_type=tc_podcast&p=3136707",
+    "https://techcrunch.com/?p=3136609"
   ],
   "producthunt": [
     "tag:www.producthunt.com,2005:Post/1170217",
@@ -183,7 +201,17 @@
     "tag:www.producthunt.com,2005:Post/1136080",
     "tag:www.producthunt.com,2005:Post/1180049",
     "tag:www.producthunt.com,2005:Post/1179833",
-    "tag:www.producthunt.com,2005:Post/1178826"
+    "tag:www.producthunt.com,2005:Post/1178826",
+    "tag:www.producthunt.com,2005:Post/1171509",
+    "tag:www.producthunt.com,2005:Post/1181134",
+    "tag:www.producthunt.com,2005:Post/1181352",
+    "tag:www.producthunt.com,2005:Post/1180675",
+    "tag:www.producthunt.com,2005:Post/1181257",
+    "tag:www.producthunt.com,2005:Post/1180525",
+    "tag:www.producthunt.com,2005:Post/1179055",
+    "tag:www.producthunt.com,2005:Post/1181329",
+    "tag:www.producthunt.com,2005:Post/1180522",
+    "tag:www.producthunt.com,2005:Post/1176131"
   ],
   "lobsters": [
     "https://lobste.rs/s/inzoi4",
@@ -208,6 +236,8 @@
     "https://lobste.rs/s/5ej4m6",
     "https://lobste.rs/s/jrj4o3",
     "https://lobste.rs/s/8soruc",
-    "https://lobste.rs/s/gv5yqm"
+    "https://lobste.rs/s/gv5yqm",
+    "https://lobste.rs/s/qsp10b",
+    "https://lobste.rs/s/tjpsew"
   ]
 }
