@@ -39,7 +39,17 @@
     "2606.27288v1",
     "2606.27287v1",
     "2606.27275v1",
-    "2606.27251v1"
+    "2606.27251v1",
+    "2606.28279v1",
+    "2606.28277v1",
+    "2606.28274v1",
+    "2606.28270v1",
+    "2606.28249v1",
+    "2606.28235v1",
+    "2606.28217v1",
+    "2606.28215v1",
+    "2606.28186v1",
+    "2606.28182v1"
   ],
   "hn": [
     "https://news.ycombinator.com/item?id=48585746",
@@ -83,7 +93,12 @@
     "https://news.ycombinator.com/item?id=48696585",
     "https://news.ycombinator.com/item?id=48709670",
     "https://news.ycombinator.com/item?id=48708941",
-    "https://news.ycombinator.com/item?id=48707763"
+    "https://news.ycombinator.com/item?id=48707763",
+    "https://news.ycombinator.com/item?id=48721903",
+    "https://news.ycombinator.com/item?id=48721072",
+    "https://news.ycombinator.com/item?id=48720924",
+    "https://news.ycombinator.com/item?id=48719485",
+    "https://news.ycombinator.com/item?id=48718102"
   ],
   "techcrunch": [
     "https://techcrunch.com/?p=3134483",
@@ -146,7 +161,15 @@
     "https://techcrunch.com/?p=3136677",
     "https://techcrunch.com/?p=3136944",
     "https://techcrunch.com/?p=3137021",
-    "https://techcrunch.com/?p=3136862"
+    "https://techcrunch.com/?p=3136862",
+    "https://techcrunch.com/?p=3137386",
+    "https://techcrunch.com/?p=3137238",
+    "https://techcrunch.com/?p=3137204",
+    "https://techcrunch.com/?p=3137220",
+    "https://techcrunch.com/?p=3137155",
+    "https://techcrunch.com/?p=3137152",
+    "https://techcrunch.com/?p=3136644",
+    "https://techcrunch.com/?p=3137020"
   ],
   "producthunt": [
     "tag:www.producthunt.com,2005:Post/1170217",
@@ -240,7 +263,17 @@
     "tag:www.producthunt.com,2005:Post/1178202",
     "tag:www.producthunt.com,2005:Post/1180034",
     "tag:www.producthunt.com,2005:Post/1182736",
-    "tag:www.producthunt.com,2005:Post/1182460"
+    "tag:www.producthunt.com,2005:Post/1182460",
+    "tag:www.producthunt.com,2005:Post/1133685",
+    "tag:www.producthunt.com,2005:Post/1179811",
+    "tag:www.producthunt.com,2005:Post/1181198",
+    "tag:www.producthunt.com,2005:Post/1182762",
+    "tag:www.producthunt.com,2005:Post/1182365",
+    "tag:www.producthunt.com,2005:Post/1175520",
+    "tag:www.producthunt.com,2005:Post/1181462",
+    "tag:www.producthunt.com,2005:Post/1156488",
+    "tag:www.producthunt.com,2005:Post/1183145",
+    "tag:www.producthunt.com,2005:Post/1180072"
   ],
   "lobsters": [
     "https://lobste.rs/s/inzoi4",
@@ -275,6 +308,7 @@
     "https://lobste.rs/s/n2r6r6",
     "https://lobste.rs/s/hvd5hk",
     "https://lobste.rs/s/ibji5x",
-    "https://lobste.rs/s/4srepl"
+    "https://lobste.rs/s/4srepl",
+    "https://lobste.rs/s/7exvix"
   ]
 }
